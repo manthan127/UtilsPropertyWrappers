@@ -7,14 +7,14 @@
 
 import Foundation
 
-@propertyWrapper struct DecodedFromString<Value: LosslessStringConvertible> {
+@propertyWrapper public struct DecodedFromString<Value: LosslessStringConvertible> {
     private var value: Value?
     
-    init(wrappedValue: Value?) {
+    public init(wrappedValue: Value?) {
         self.value = wrappedValue
     }
     
-    var wrappedValue: Value? {
+    public var wrappedValue: Value? {
         get {
             value
         }  set {
@@ -24,7 +24,7 @@ import Foundation
 }
 
 extension DecodedFromString: Decodable where Value: Decodable {
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         
         if let stringValue = try? container.decode(String.self),
