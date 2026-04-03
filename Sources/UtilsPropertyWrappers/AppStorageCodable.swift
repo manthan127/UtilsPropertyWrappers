@@ -16,10 +16,14 @@ import Combine
 public struct AppStorageCodable<Value: Codable>: DynamicProperty {
     @StateObject private var storage: CodableStorage<Value>
     
-    public init(wrappedValue: Value, _ key: String) {
+    public init(wrappedValue: Value, _ key: String, store: UserDefaults? = nil) {
         _storage = StateObject(
-            wrappedValue: CodableStorage(key: key, defaultValue: wrappedValue)
+            wrappedValue: CodableStorage(key: key, defaultValue: wrappedValue, store: store ?? .standard)
         )
+    }
+    
+    public init(_ key: String, store: UserDefaults? = nil) where Value: ExpressibleByNilLiteral {
+        _storage = StateObject(wrappedValue: CodableStorage(key: key, store: store ?? .standard))
     }
     
     public var wrappedValue: Value {
@@ -38,31 +42,20 @@ private final class CodableStorage<Value: Codable>: ObservableObject {
     private let key: String
     private let store: UserDefaults
     
-    init(key: String, defaultValue: Value, store: UserDefaults = .standard) {
+    init(key: String, defaultValue: Value, store: UserDefaults) {
         self.key = key
         self.store = store
+        self.value = CodableStorage.decodeValue(key: key, store: store) ?? defaultValue
         
-        if let data = store.data(forKey: key),
-           let decoded = try? data.jsonDecoded(Value.self) {
-            self.value = decoded
-        } else {
-            self.value = defaultValue
-        }
-        // Might be issue when model is very big and there are to many observers
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(sync),
-            name: UserDefaults.didChangeNotification,
-            object: store
-        )
+        startObserver()
     }
-    @objc private func sync() {
-        if let data = store.data(forKey: key),
-           let decoded = try? data.jsonDecoded(Value.self) {
-            // TODO: only update value if value at the key is changed
-            // TODO: do not change if value is not changed
-            value = decoded
-        }
+    
+    init(key: String, store: UserDefaults) where Value: ExpressibleByNilLiteral {
+        self.key = key
+        self.store = store
+        self.value = CodableStorage.decodeValue(key: key, store: store) ?? nil
+        
+        startObserver()
     }
     
     func set(_ newValue: Value) {
@@ -71,16 +64,26 @@ private final class CodableStorage<Value: Codable>: ObservableObject {
             store.set(data, forKey: key)
         }
     }
-}
-
-extension Data {
-    func jsonDecoded<D: Decodable>(_ type: D.Type, decoder: JSONDecoder = JSONDecoder()) throws -> D {
-        try decoder.decode(type, from: self)
+    // TODO: check for UserDefaults other than UserDefaults.standard
+    // Might be issue when model is very big and there are to many observers
+    func startObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sync),
+            name: UserDefaults.didChangeNotification,
+            object: store
+        )
     }
-}
-
-extension Encodable {
-    func jsonEncoded(encoder: JSONEncoder = JSONEncoder()) throws -> Data {
-        try encoder.encode(self)
+    
+    @objc private func sync() {
+        if let decoded = CodableStorage.decodeValue(key: key, store: store) {
+            // TODO: only update value if value at the key is changed
+            // TODO: do not change if value is not changed
+            value = decoded
+        }
+    }
+    
+    static private func decodeValue(key: String, store: UserDefaults) -> Value? {
+        try? store.data(forKey: key)?.jsonDecoded(Value.self)
     }
 }
