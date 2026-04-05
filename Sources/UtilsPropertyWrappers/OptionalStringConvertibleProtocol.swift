@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// This is used internally and is not meant to be used directly in your code.
 public protocol OptionalStringConvertibleProtocol {
     associatedtype Value
     static func makeFromString(_ string: String, container: any SingleValueDecodingContainer) throws -> Value
