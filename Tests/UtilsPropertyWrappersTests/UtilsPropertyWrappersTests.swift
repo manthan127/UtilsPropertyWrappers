@@ -19,13 +19,13 @@ struct DecodingOptionalStruct: Decodable {
 
 fileprivate extension Encodable {
     func decodeTo<T: Decodable>(_ type: T.Type) throws -> T {
-        self.jsonEncoded().jsonDecoded(type.self)
+        try self.jsonEncoded().jsonDecoded(type.self)
     }
 }
 
 final class UtilsPropertyWrappersTests: XCTestCase {
     func testBaseCase() throws {
-        let test:  = try EncodingStruct(x: 54).decodeTo(DecodingStruct.self)
+        let test = try EncodingStruct(x: 54).decodeTo(DecodingStruct.self)
         
         XCTAssertEqual(test.x, 54)
     }
@@ -45,7 +45,7 @@ final class UtilsPropertyWrappersTests: XCTestCase {
     }
     
     func testFromStringToOptional() throws {
-        let test = try EncodingStringStruct(x: "54").decodeTo(DecodingStruct.self)
+        let test = try EncodingStringStruct(x: "54").decodeTo(DecodingOptionalStruct.self)
         XCTAssertEqual(test.x, 54)
     }
     
