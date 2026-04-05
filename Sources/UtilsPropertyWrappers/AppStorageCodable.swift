@@ -13,7 +13,6 @@ import Combine
 // @AppStorage is some how updating in directly view and from ObsevableObject, we are using different propertyWrapper
 // TODO: try mearging AppStorageCodablePublished, AppStorageCodable in two one @propertyWrapper like appstorage
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper
 public struct AppStorageCodable<Value: Codable>: DynamicProperty {
     @StateObject private var storage: CodableStorage<Value>
@@ -40,7 +39,6 @@ public struct AppStorageCodable<Value: Codable>: DynamicProperty {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper
 public struct AppStorageCodablePublished<Value: Codable>: DynamicProperty {
     private var storage: CodableStorage<Value>
@@ -79,7 +77,6 @@ public struct AppStorageCodablePublished<Value: Codable>: DynamicProperty {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 fileprivate final class CodableStorage<Value: Codable>: ObservableObject {
     // this @Published might be why this is not working as expected inside ObsevableObject class
     @Published var value: Value
@@ -126,7 +123,7 @@ fileprivate final class CodableStorage<Value: Codable>: ObservableObject {
         }
     }
     
-    fileprivate static func decodeValue<Value: Decodable>(key: String, store: UserDefaults) -> Value? {
+    fileprivate static func decodeValue(key: String, store: UserDefaults) -> Value? {
         try? store.data(forKey: key)?.jsonDecoded(Value.self)
     }
 }

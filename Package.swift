@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "UtilsPropertyWrappers",
-    platforms: [.macOS(.v10_13), .iOS(.v12), .tvOS(.v12), .watchOS(.v4)],
+    platforms: [.macOS(.v11), .iOS(.v14), .tvOS(.v14), .watchOS(.v7)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(

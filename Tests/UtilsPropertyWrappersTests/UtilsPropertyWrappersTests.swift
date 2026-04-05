@@ -1,6 +1,10 @@
 import XCTest
 @testable import UtilsPropertyWrappers
 
+struct EmptyEncodable: Encodable {
+    var y: Int = 5
+}
+
 struct EncodingStringStruct: Encodable {
     @DecodedFromString var x: String
 }
@@ -10,11 +14,13 @@ struct EncodingStruct: Encodable {
 }
 
 struct DecodingStruct: Decodable {
-    @DecodedFromString var x: Int
+    @DecodedFromString 
+    var x: Int
 }
 
 struct DecodingOptionalStruct: Decodable {
-    @DecodedFromString var x: Int?
+    @DecodedFromString 
+    var x: Int?
 }
 
 fileprivate extension Encodable {
@@ -26,7 +32,6 @@ fileprivate extension Encodable {
 final class UtilsPropertyWrappersTests: XCTestCase {
     func testBaseCase() throws {
         let test = try EncodingStruct(x: 54).decodeTo(DecodingStruct.self)
-        
         XCTAssertEqual(test.x, 54)
     }
     
@@ -35,13 +40,23 @@ final class UtilsPropertyWrappersTests: XCTestCase {
         XCTAssertEqual(test.x, 54)
     }
     
-    func testFromStringInvalid() {
+    func testFromInvalidString() {
         XCTAssertThrowsError(
             try EncodingStringStruct(x: "invalid input").decodeTo(DecodingStruct.self)
-        ) { error in
-            // Optional: You can inspect the error here
-            print("Caught expected error: \(error)")
-        }
+        )
+    }
+    
+    func testEmpty() {
+        XCTAssertThrowsError(
+            try EmptyEncodable().decodeTo(DecodingStruct.self)
+        )
+    }
+}
+ 
+extension UtilsPropertyWrappersTests {
+    func testBaseCaseOptional() throws {
+        let test = try EncodingStruct(x: 54).decodeTo(DecodingOptionalStruct.self)
+        XCTAssertEqual(test.x, 54)
     }
     
     func testFromStringToOptional() throws {
@@ -49,9 +64,14 @@ final class UtilsPropertyWrappersTests: XCTestCase {
         XCTAssertEqual(test.x, 54)
     }
     
-    // should invalid string throw error or just give nil ??
-    func testFromStringToOptionalWrong() throws {
+    func testFromInvalidStringOptional() throws {
         let test = try EncodingStringStruct(x: "should be nil").decodeTo(DecodingOptionalStruct.self)
+        XCTAssertEqual(test.x, nil)
+    }
+    
+    // this is failing and throwing error
+    func testEmptyOptional() throws {
+        let test = try EmptyEncodable().decodeTo(DecodingOptionalStruct.self)
         XCTAssertEqual(test.x, nil)
     }
 }
