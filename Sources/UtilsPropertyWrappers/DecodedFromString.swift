@@ -8,6 +8,18 @@
 import Foundation
 
 //TODO: allow optional values
+
+/// A property wrapper that allows decoding values from strings when an API returns numeric or boolean values as strings instead of their native types.
+///
+/// This wrapper supports types conforming to [`LosslessStringConvertible`](https://developer.apple.com/documentation/swift/losslessstringconvertible), such as `Int`, `Double`, `Bool`, `String`, and their optional variants.
+///
+/// Example:
+/// ```swift
+/// struct ApiResponse: Decodable {
+///     @DecodedFromString var id: Int
+///     @DecodedFromString var price: Double?
+/// }
+/// ```
 @propertyWrapper public struct DecodedFromString<Value: OptionalStringConvertibleProtocol> {
     private var value: Value
     

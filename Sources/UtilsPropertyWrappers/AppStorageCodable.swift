@@ -13,6 +13,8 @@ import Combine
 // @AppStorage is some how updating in directly view and from ObsevableObject, we are using different propertyWrapper
 // TODO: try mearging AppStorageCodablePublished, AppStorageCodable in two one @propertyWrapper like appstorage
 
+/// A property wrapper type that reflects a value from `UserDefaults` and
+/// invalidates a view on a change in value in that user default.
 @propertyWrapper
 public struct AppStorageCodable<Value: Codable>: DynamicProperty {
     @StateObject private var storage: CodableStorage<Value>
@@ -39,6 +41,8 @@ public struct AppStorageCodable<Value: Codable>: DynamicProperty {
     }
 }
 
+/// A property wrapper type that reflects a value from `UserDefaults` and
+/// invalidates a view on a change in value in that user default.
 @propertyWrapper
 public struct AppStorageCodablePublished<Value: Codable>: DynamicProperty {
     private var storage: CodableStorage<Value>
@@ -56,6 +60,7 @@ public struct AppStorageCodablePublished<Value: Codable>: DynamicProperty {
         nonmutating set { storage.set(newValue) }
     }
     
+    // this might be wrong // because @Published is returning Published<Value>.Publisher
     public var projectedValue: Binding<Value> {
         .init { storage.value } set: { storage.set($0) }
     }
