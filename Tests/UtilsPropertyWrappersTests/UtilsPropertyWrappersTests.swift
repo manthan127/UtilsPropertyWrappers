@@ -1,8 +1,9 @@
 import XCTest
 @testable import UtilsPropertyWrappers
 
-struct EmptyEncodable: Encodable {
-    var y: Int = 5
+struct EmptyEncodable: Encodable {}
+struct NilEncodable: Encodable {
+    @DecodedFromString var x: String? = nil
 }
 
 struct EncodingStringStruct: Encodable {
@@ -14,13 +15,15 @@ struct EncodingStruct: Encodable {
 }
 
 struct DecodingStruct: Decodable {
-    @DecodedFromString 
-    var x: Int
+    @DecodedFromString var x: Int
+}
+
+struct DecodingDefaultStruct: Decodable {
+    @DecodedFromString var x: Int = 777
 }
 
 struct DecodingOptionalStruct: Decodable {
-    @DecodedFromString 
-    var x: Int?
+    @DecodedFromString var x: Int?
 }
 
 fileprivate extension Encodable {
@@ -51,6 +54,18 @@ final class UtilsPropertyWrappersTests: XCTestCase {
             try EmptyEncodable().decodeTo(DecodingStruct.self)
         )
     }
+    
+    func testNilEncoded() throws {
+        XCTAssertThrowsError(
+            try NilEncodable().decodeTo(DecodingStruct.self)
+        )
+    }
+    
+    // TODO: - this is the only case not working
+    func testDefaultVal() throws {
+        let test = try EmptyEncodable().decodeTo(DecodingDefaultStruct.self)
+        XCTAssertEqual(test.x, 777)
+    }
 }
  
 extension UtilsPropertyWrappersTests {
@@ -66,12 +81,16 @@ extension UtilsPropertyWrappersTests {
     
     func testFromInvalidStringOptional() throws {
         let test = try EncodingStringStruct(x: "should be nil").decodeTo(DecodingOptionalStruct.self)
-        XCTAssertEqual(test.x, nil)
+        XCTAssertNil(test.x)
     }
     
-    // this is failing and throwing error
     func testEmptyOptional() throws {
         let test = try EmptyEncodable().decodeTo(DecodingOptionalStruct.self)
-        XCTAssertEqual(test.x, nil)
+        XCTAssertNil(test.x)
+    }
+    
+    func testNilOptional() throws {
+        let test = try NilEncodable().decodeTo(DecodingOptionalStruct.self)
+        XCTAssertNil(test.x)
     }
 }

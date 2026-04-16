@@ -5,6 +5,7 @@
 //  Created by Home on 10/01/26.
 //
 
+#if canImport(Darwin)
 import Foundation
 import SwiftUI
 import Combine
@@ -132,3 +133,5 @@ fileprivate final class CodableStorage<Value: Codable>: ObservableObject {
         try? store.data(forKey: key)?.jsonDecoded(Value.self)
     }
 }
+
+#endif

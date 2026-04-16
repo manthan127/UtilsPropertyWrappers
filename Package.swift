@@ -13,6 +13,9 @@ let package = Package(
             targets: ["UtilsPropertyWrappers"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/nalexn/ViewInspector", exact: "0.10.0") // from: "0.10.0"
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
@@ -22,7 +25,8 @@ let package = Package(
         .testTarget(
             name: "UtilsPropertyWrappersTests",
             dependencies: [
-                "UtilsPropertyWrappers"
+                "UtilsPropertyWrappers",
+                .product(name: "ViewInspector", package: "ViewInspector")
             ]
         )
     ]
