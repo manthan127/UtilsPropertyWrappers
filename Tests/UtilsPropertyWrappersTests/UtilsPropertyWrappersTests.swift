@@ -1,36 +1,4 @@
 import XCTest
-@testable import UtilsPropertyWrappers
-
-struct EmptyEncodable: Encodable {}
-struct NilEncodable: Encodable {
-    @DecodedFromString var x: String? = nil
-}
-
-struct EncodingStringStruct: Encodable {
-    @DecodedFromString var x: String
-}
-
-struct EncodingStruct: Encodable {
-    @DecodedFromString var x: Int
-}
-
-struct DecodingStruct: Decodable {
-    @DecodedFromString var x: Int
-}
-
-struct DecodingDefaultStruct: Decodable {
-    @DecodedFromString var x: Int = 777
-}
-
-struct DecodingOptionalStruct: Decodable {
-    @DecodedFromString var x: Int?
-}
-
-fileprivate extension Encodable {
-    func decodeTo<T: Decodable>(_ type: T.Type) throws -> T {
-        try self.jsonEncoded().jsonDecoded(type.self)
-    }
-}
 
 final class UtilsPropertyWrappersTests: XCTestCase {
     func testBaseCase() throws {
